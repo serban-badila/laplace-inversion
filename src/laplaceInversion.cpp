@@ -6,9 +6,6 @@
 #include <cmath>
 #include  <vector>
 
-#include <fftw3.h>
-
-
 /* Test client */
 
 std::complex<double> exp_transform(std::complex<double> s) {

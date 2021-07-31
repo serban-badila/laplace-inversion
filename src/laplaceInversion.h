@@ -36,7 +36,7 @@ std::vector<double> __oneDimensionalInverse(
     
     */
 {       
-    // approximate the inital transform with its quadrature
+    // approximate the initial transform with its quadrature
     std::complex<double> I {0.0 , 1.0}; // complex literals require >=c++14
     unsigned int m {static_cast<unsigned int>(pow(2, mexp))};
     unsigned int m2 {OVRSMPL * m};
