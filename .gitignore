@@ -34,3 +34,8 @@
 # Build directories
 build/
 fftw/
+
+
+# IDE artifacts
+.idea
+.vscode
