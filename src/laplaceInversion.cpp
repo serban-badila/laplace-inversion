@@ -25,7 +25,7 @@ int main() {
     unsigned int mexp {10};
     int m2 = 8 * pow(2, mexp);
     
-    std::vector<double> inverse = laplaceInversion::oneDimensionalInverse(&exp_transform, delta, mexp, n);
+    std::vector<double> inverse = laplaceInversion::oneDimensionalInverse(exp_transform, delta, mexp, n);
     
     int index{5};
     std::cout << "Inverse: " << inverse[index] << std::endl;

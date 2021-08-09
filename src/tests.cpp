@@ -71,24 +71,22 @@ class oneDimensionalTest : public ::testing::Test {
         int n {48};
         double delta {.1};
         unsigned int mexp {15};
-        int m2;
         int m;
-        size_t eval_num;
         double err;
 
         void SetUp() override {
             m = pow(2, mexp);
-            m2 = OVRSMPL * m;
+            err = pow(10, -14);
         }
 };
 
 
 TEST_F(oneDimensionalTest, InvertExponentialTransform){ 
 
-    auto inverse = laplaceInversion::oneDimensionalInverse(&exp_transform, delta, mexp, n);
+    auto inverse = laplaceInversion::oneDimensionalInverse(exp_transform, delta, mexp, n);
  
     for (size_t j = 1; j < m; j++){
-        EXPECT_NEAR (inverse[j], exponential_df(double(j)*delta), pow(10, -14));
+        EXPECT_NEAR (inverse[j], exponential_df(double(j)*delta), err);
     }
 }
 
@@ -96,38 +94,38 @@ TEST_F(oneDimensionalTest, InvertExponentialTransform){
 
 TEST_F(oneDimensionalTest, InvertNormalTransform){
 
-    auto inverse = laplaceInversion::oneDimensionalInverse(&normal_transform, delta, mexp, n);
+    auto inverse = laplaceInversion::oneDimensionalInverse(normal_transform, delta, mexp, n);
 
     for (size_t j = 1; j < m; j++){
-        EXPECT_NEAR (inverse[j], centered_normal(double(j)*delta), pow(10, -14));
+        EXPECT_NEAR (inverse[j], centered_normal(double(j)*delta), err);
     }
 }
 
 
 TEST_F(oneDimensionalTest, InvertScaledExponentialTransform){
 
-    auto inverse = laplaceInversion::oneDimensionalInverse(&scaled_exp_transform, delta, mexp, n);
+    auto inverse = laplaceInversion::oneDimensionalInverse(scaled_exp_transform, delta, mexp, n);
 
     for (size_t j = 1; j < m; j++){
-        EXPECT_NEAR (inverse[j], scaled_exp(double(j)*delta), pow(10, -14));
+        EXPECT_NEAR (inverse[j], scaled_exp(double(j)*delta), err);
     }
 }
 
 TEST_F(oneDimensionalTest, InvertSineTransform){
 
-    auto inverse = laplaceInversion::oneDimensionalInverse(&sine_transform, delta, mexp, n);
+    auto inverse = laplaceInversion::oneDimensionalInverse(sine_transform, delta, mexp, n);
 
     for (size_t j = 1; j < m; j++){
-        EXPECT_NEAR (inverse[j], std::sin(double(j)*delta), pow(10, -12)); // loosing some precision here; could be the sine implementation ?
+        EXPECT_NEAR (inverse[j], std::sin(double(j)*delta), err * 100); // loosing some precision here; could be the sine implementation ?
     }
 }
 
 TEST_F(oneDimensionalTest, InvertScaledCosineTransform){
 
-    auto inverse = laplaceInversion::oneDimensionalInverse(&scaled_cosine_transform, delta, mexp, n);
+    auto inverse = laplaceInversion::oneDimensionalInverse(scaled_cosine_transform, delta, mexp, n);
 
     for (size_t j = 1; j < m; j++){
-        EXPECT_NEAR (inverse[j], scaled_cosine(double(j)*delta), pow(10, -8)); // also losing precision here; 
+        EXPECT_NEAR (inverse[j], scaled_cosine(double(j)*delta), err * pow(10, 6)); // also losing precision here; 
         // this is the worst case tolerance among these iterations.
     }
 }

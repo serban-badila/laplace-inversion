@@ -1,5 +1,6 @@
 #include <vector>
 #include <complex>
+#include <functional>
 
 #include <fftw3.h>
 
@@ -8,11 +9,11 @@
 
 namespace laplaceInversion {
 
-void loadGaussQuadRule (const int , std::vector<double>& , std::vector<double>& );
+void loadGaussQuadRule(const int , std::vector<double>& , std::vector<double>& );
 
 
 std::vector<double> oneDimensionalInverse(
-    std::complex<double> (*f_hat)(std::complex<double>), 
+    std::function<std::complex<double>(std::complex<double>)> f_hat,
     double delta, 
     unsigned int mexp,
     int n,
@@ -20,8 +21,33 @@ std::vector<double> oneDimensionalInverse(
 );
 
 
+/* Implementation */
+
+void __ifft(std::complex<double>* input, std::vector<double> &output, size_t len, double a)
+    /* Wrap the Fast Fourier Transform routine. */
+{   size_t m = len / OVRSMPL;
+    fftw_complex *in, *out;
+    fftw_plan p;
+
+    in = (fftw_complex*) (input);
+    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * len);
+
+    p = fftw_plan_dft_1d(len, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_execute(p);    
+    
+    std::complex<double>* inverse = (std::complex<double>*) *out; // safe casting to complex<double> is guaranteed
+
+    output.resize(m);
+    for (int k=0; k < m; k++){
+        output[k] = exp(a*k)/static_cast<double>(len) * inverse[k].real(); // the ifft doesn't normalize the inverse with <m2> so do it here
+    }
+
+    fftw_destroy_plan(p);
+    fftw_free(out);
+}
+
 std::vector<double> __oneDimensionalInverse(
-    std::complex<double> (*f_hat)(std::complex<double>), 
+    std::function<std::complex<double>(std::complex<double>)> f_hat,
     double delta, 
     int mexp, 
     int n, 
@@ -54,26 +80,11 @@ std::vector<double> __oneDimensionalInverse(
     quad_approx[0] = .5 * (quad_approx[0] + quad_approx[m2]);
 
     // now run the inverse Fast Fourier transform on the quadrature
-    fftw_complex *in, *out;
-    fftw_plan p;
-
-    in = (fftw_complex*) (quad_approx); // the last index will not be used in the fft
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * m2);
-
-    p = fftw_plan_dft_1d(m2, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
-    fftw_execute(p);    
     
-    std::complex<double>* inverse = (std::complex<double>*) *out; // safe casting to complex<double> is guaranteed
-
-    std::vector<double> v_inv_d(m2);
-    for (int k=0; k < m; k++){
-        v_inv_d[k] = exp(a*k)/static_cast<double>(m2) * inverse[k].real(); // the ifft doesn't normalize the inverse with <m2> so do it here
-    }
-
-    fftw_destroy_plan(p);
-    fftw_free(out);
-
-    return v_inv_d;
+    std::vector<double> output;
+    __ifft(quad_approx, output, m2, a); // the last index of the <quad_approx> will not be used in the ifft
+    
+    return output;
 }
 
 
@@ -145,7 +156,7 @@ void loadGaussQuadRule(const int n, std::vector<double>& beta, std::vector<doubl
 
 
 std::vector<double> oneDimensionalInverse(
-    std::complex<double> (*f_hat)(std::complex<double>), 
+    std::function<std::complex<double>(std::complex<double>)> f_hat,
     double delta, 
     unsigned int mexp,
     int n
