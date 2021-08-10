@@ -1,10 +1,10 @@
-#include "laplaceInversion.h"
-
 #include <memory>
 #include <iostream>
 #include <complex> // include this before the FFT library
 #include <cmath>
-#include  <vector>
+#include <vector>
+
+#include "laplaceInversion.h"
 
 /* Test client */
 
@@ -23,7 +23,6 @@ int main() {
     
     double delta {.1};
     unsigned int mexp {10};
-    int m2 = 8 * pow(2, mexp);
     
     std::vector<double> inverse = laplaceInversion::oneDimensionalInverse(exp_transform, delta, mexp, n);
     

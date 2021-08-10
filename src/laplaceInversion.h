@@ -9,9 +9,6 @@
 
 namespace laplaceInversion {
 
-void loadGaussQuadRule(const int , std::vector<double>& , std::vector<double>& );
-
-
 std::vector<double> oneDimensionalInverse(
     std::function<std::complex<double>(std::complex<double>)> f_hat,
     double delta, 
@@ -34,12 +31,10 @@ void __ifft(std::complex<double>* input, std::vector<double> &output, size_t len
 
     p = fftw_plan_dft_1d(len, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(p);    
-    
-    std::complex<double>* inverse = (std::complex<double>*) *out; // safe casting to complex<double> is guaranteed
 
     output.resize(m);
-    for (int k=0; k < m; k++){
-        output[k] = exp(a*k)/static_cast<double>(len) * inverse[k].real(); // the ifft doesn't normalize the inverse with <m2> so do it here
+    for (size_t k=0; k < m; k++){
+        output[k] = exp(a*k) / len * out[k][0]; // the ifft doesn't normalize the inverse with <m2> so do it here
     }
 
     fftw_destroy_plan(p);
@@ -50,7 +45,7 @@ std::vector<double> __oneDimensionalInverse(
     std::function<std::complex<double>(std::complex<double>)> f_hat,
     double delta, 
     int mexp, 
-    int n, 
+    unsigned int n, 
     std::vector<double> &lambda, 
     std::vector<double> &beta
 )
@@ -58,20 +53,22 @@ std::vector<double> __oneDimensionalInverse(
     Private function. 
 
     Args:
-        delta: mesh size;
+        mexp: the exponent defining the number of evaluation points (2^mexp).
+        delta: mesh width.
+        n: The size of the Gauss quadrature;
     
     */
 {       
     // approximate the initial transform with its quadrature
     std::complex<double> I {0.0 , 1.0}; // complex literals require >=c++14
-    unsigned int m {static_cast<unsigned int>(pow(2, mexp))};
-    unsigned int m2 {OVRSMPL * m};
+    size_t m {static_cast<size_t> (pow(2, mexp))};
+    size_t m2 {OVRSMPL * m};
     std::complex<double> quad_approx[m2+1];
     double a { 44.0 / static_cast<double> (m2) };
 
     std::complex<double> temp;
-    for (int k=0; k <= m2; k++){
-        for (int j = 1; j <= n/2; j++){
+    for (size_t k = 0; k <= m2; k++){
+        for (size_t j = 1; j <= n/2; j++){
             temp = f_hat((a + lambda[j] * I + 2.0 * PI * k/m2 * I)/delta);
             quad_approx[k] += beta[j] * temp; 
         }
@@ -80,15 +77,14 @@ std::vector<double> __oneDimensionalInverse(
     quad_approx[0] = .5 * (quad_approx[0] + quad_approx[m2]);
 
     // now run the inverse Fast Fourier transform on the quadrature
-    
     std::vector<double> output;
-    __ifft(quad_approx, output, m2, a); // the last index of the <quad_approx> will not be used in the ifft
+    __ifft(quad_approx, output, m2, a); // the last index of <quad_approx> will not be used in the ifft
     
     return output;
 }
 
 
-void loadGaussQuadRule(const int n, std::vector<double>& beta, std::vector<double>& lambda)
+void __loadGaussQuadRule(const int n, std::vector<double>& beta, std::vector<double>& lambda)
 {   
     switch (n)
     {
@@ -166,25 +162,19 @@ std::vector<double> oneDimensionalInverse(
     Compute the inverse of a one-dimensional Laplace-Stieltjes Transform using den Iseger's algorithm.
 
     Args:
-        f_hat: function pointer to the Laplace tansform to be inverted.
+        f_hat: the Laplace tansform to be inverted.
         mexp: the exponent defining the number of evaluation points (2^mexp) for the inverse where precision is guaranteed; 
             The transform evaluation uses an oversampling factor, <OVRSMPL> * 2^(mexp).
-        delta: mesh size; 
-        mexp: The number of evaluation/sampling points is 2^(mexp); Applies to the inverse; 
+        delta: mesh width.
         n: The size of the Gauss quadrature; Choose between 16, 32 and 48; Defaults to 16. 
     
     Returns:
-            A std::vector<double> containing the inverse function evaluated at {0, delta, 2*delta, ...}
+            A std::vector containing the inverse function evaluated at {0, delta, 2*delta, ...}.
     */
+    std::vector<double> lambda, beta;
+    __loadGaussQuadRule(n, beta, lambda);
 
-    int quad_size { int(n/2) };
-    std::vector<double> beta;
-    std::vector<double> lambda;
-    loadGaussQuadRule(n, beta, lambda);
-    std::vector<double> inverse_array;
-
-
-    inverse_array = __oneDimensionalInverse(f_hat, delta, mexp, n, lambda, beta);
+    auto inverse_array = __oneDimensionalInverse(f_hat, delta, mexp, n, lambda, beta);
     return inverse_array;
 }
 
