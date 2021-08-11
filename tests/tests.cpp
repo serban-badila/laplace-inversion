@@ -91,7 +91,7 @@ TEST_F(oneDimensionalTest, InvertExponentialTransform){
         // set the evaluation points away from the origin because the inverse has a discontinuity there
         EXPECT_NEAR (inverse[j], exponential_df(double(j)*delta), err);
     }
-    EXPECT_EQ( inverse[0], .5 * (exponential_df(0) + exponential_df(-err))); // the inverse is normalized at discontinuities.
+    EXPECT_EQ (inverse[0], .5 * (exponential_df(0) + exponential_df(-err))); // the inverse is normalized at discontinuities.
 }
 
 
@@ -120,7 +120,7 @@ TEST_F(oneDimensionalTest, InvertSineTransform){
     auto inverse = laplaceInversion::oneDimensionalInverse(sine_transform, delta, mexp, n);
 
     for (size_t j = 0; j < m; j++){
-        EXPECT_NEAR (inverse[j], std::sin(double(j)*delta), err * 100); // loosing some precision here; could be the sine implementation ?
+        EXPECT_NEAR (inverse[j], std::sin(double(j)*delta), err * 100); // losing some precision here; could be the sine implementation ?
     }
 }
 

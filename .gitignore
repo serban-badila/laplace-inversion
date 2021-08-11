@@ -39,3 +39,6 @@ fftw/
 # IDE artifacts
 .idea
 .vscode
+
+# caches 
+__pycache__
