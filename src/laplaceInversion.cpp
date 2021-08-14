@@ -1,5 +1,3 @@
-#include <memory>
-#include <iostream>
 #include <complex> // include this before the FFTW library
 #include <cmath>
 #include <vector>
@@ -8,7 +6,7 @@
 
 namespace laplaceInversion {
 
-void __ifft(std::complex<double>* input, std::vector<double> &output, size_t len, double a)
+void __ifft(std::complex<double>* input, std::vector<double>& output, size_t len, double a)
     /* Wrap the Fast Fourier Transform C routine. */
 {   size_t m = len / OVRSMPL;
     fftw_complex *in, *out;
@@ -22,7 +20,7 @@ void __ifft(std::complex<double>* input, std::vector<double> &output, size_t len
 
     output.resize(m);
     for (size_t k=0; k < m; k++){
-        output[k] = exp(a*k) / len * out[k][0]; // the ifft doesn't normalize the inverse with <m2> so do it here
+        output[k] = exp(a*k) / len * out[k][0]; // the ifft doesn't normalize the inverse with <len> so do it here
     }
 
     fftw_destroy_plan(p);

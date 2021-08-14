@@ -15,19 +15,19 @@ ExternalProject_Add(project_fftw
   URL http://www.fftw.org/fftw-3.3.9.tar.gz
   PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/fftw
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fftw/src/project_fftw/configure --with-pic
-  # The option above will force the configure shell to add the PIC flag (CMake has no control here), 
+  # The option above will force the configure shell to compile with the PIC flag (CMake has no control here),
   # this is needed to be able to link against the generated pybind module later on
   --prefix=${CMAKE_CURRENT_SOURCE_DIR}/fftw/install
   INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw/install
   )
 
-add_library(fftw SHARED STATIC IMPORTED)
+add_library(fftw STATIC IMPORTED)
 set(lib_fftw_name ${CMAKE_STATIC_LIBRARY_PREFIX}fftw3${CMAKE_STATIC_LIBRARY_SUFFIX})
 set_target_properties(
   fftw 
   PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/fftw/install/lib/${lib_fftw_name}
 )
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/fftw/install/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/fftw/install/include)
 
 ##### Add GTest #####
 
@@ -65,4 +65,4 @@ gtest_discover_tests(laplace_test)
 
 
 add_subdirectory(pybind11)
-add_subdirectory(python_bindings)
+add_subdirectory(py_laplace_inversion)

@@ -16,6 +16,4 @@ std::vector<double> oneDimensionalInverse(
     int n
 );
 
-// void __ifft(std::complex<double>* , std::vector<double> &, size_t , double );
-
 } // namespace laplaceInversion

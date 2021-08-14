@@ -10,14 +10,13 @@
 
 std::complex<double> exp_transform(std::complex<double> s) {
     /*Laplace transform of an exponential distribution.*/
-    return 1. / (s + .5);
+    return .5 / (s + .5);
 }
 
 double exponential_df(double x) {
-    /* Density function (DF) of an exponential distribution. 
-    This is the inverse of the above Laplace transform. */
+    /* Density function (DF) of an exponential distribution. */
     if (x >= 0.)
-        return std::exp(-.5*x);
+        return .5 * std::exp(-.5*x);
     else return 0.;    
 }
 
@@ -91,7 +90,8 @@ TEST_F(oneDimensionalTest, InvertExponentialTransform){
         // set the evaluation points away from the origin because the inverse has a discontinuity there
         EXPECT_NEAR (inverse[j], exponential_df(double(j)*delta), err);
     }
-    EXPECT_EQ (inverse[0], .5 * (exponential_df(0) + exponential_df(-err))); // the inverse is normalized at discontinuities.
+    EXPECT_EQ (inverse[0], .5 * (exponential_df(0) + exponential_df(-err))); // the inverse is "normalized" at discontinuities 
+    // in the same way as the inverse Fourier transform.
 }
 
 

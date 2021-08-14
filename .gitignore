@@ -31,10 +31,12 @@
 *.out
 *.app
 
-# Build directories
-build/
+# Build directories and artefacts
+*build/
 fftw/
-
+dist/
+*.egg-info/
+.eggs
 
 # IDE artifacts
 .idea
@@ -42,3 +44,4 @@ fftw/
 
 # caches 
 __pycache__
+.pytest_cache/
