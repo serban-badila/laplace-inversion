@@ -2,6 +2,7 @@
 Numerical inversion of Laplace transforms using Den Iseger's algorithm [1].
 
 # Usage
+Requires a c++11 capable compiler present on the target system and cmake >=3.14 (still have to test different compilers).
 
 See the [demo.py](py_laplace_inversion/demo.py)
 
@@ -29,12 +30,17 @@ python setup.py bdist_wheel
 pip install ./dist/*
 ```
 
-Besides building (cmake) the shared object, `setup.py` will also copy it into `py_laplace_inversion` and this extension can be imported as any other python module. 
+Besides building (cmake) the shared object in a separate build tree (_skbuild), `setup.py` will also copy it into `py_laplace_inversion` and this extension can be imported as any other python module. 
 Now you can run the python tests for the generated bindings
 
 ```
 python -m pytest python_tests/
 ```
 
+# TODO
+ - multi-dimensional inversion (see also [2])
+ - try to implement the general inversion algorithm (for handling functions with arbitrary discontinuities and singularities)
 
-[1] https://doi.org/10.1017/S0269964806060013
+ [1] https://doi.org/10.1017/S0269964806060013
+
+ [2] http://dx.doi.org/10.2139/ssrn.1355449 

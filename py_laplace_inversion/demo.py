@@ -1,6 +1,6 @@
 from py_laplace_inversion import laplace_inversion
 
-from math import e, exp
+from math import exp
 
 
 def exponential_transform(s):
@@ -8,7 +8,7 @@ def exponential_transform(s):
 
 
 def exponential(x):
-    return .5 * pow(e, -.5*x)
+    return .5 * exp(-.5*x)
 
 
 if __name__ == "__main__":
