@@ -9,29 +9,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall --std=c++11 -O3 -fPIC")
 
 
-# build the FFTW dependency
-include(ExternalProject)
-ExternalProject_Add(project_fftw
-  URL http://www.fftw.org/fftw-3.3.9.tar.gz
-  PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/fftw
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fftw/src/project_fftw/configure --with-pic
-  # The option above will force the configure shell to compile with the PIC flag (CMake has no control here),
-  # this is needed to be able to link against the generated pybind module later on
-  --prefix=${CMAKE_CURRENT_SOURCE_DIR}/fftw/install
-  INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw/install
-  )
-
-add_library(fftw STATIC IMPORTED)
-set(lib_fftw_name ${CMAKE_STATIC_LIBRARY_PREFIX}fftw3${CMAKE_STATIC_LIBRARY_SUFFIX})
-set_target_properties(
-  fftw 
-  PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/fftw/install/lib/${lib_fftw_name}
-)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/fftw/install/include)
-
-##### Add GTest #####
-
 include(FetchContent)
+
+##### Fetch pocketfft and configure it with a minimal cmake file ####
+
+MESSAGE(STATUS "Fetching pocketfft...")
+FetchContent_Declare(
+  pocketfftx 
+  GIT_REPOSITORY https://gitlab.mpcdf.mpg.de/mtr/pocketfft.git
+  GIT_TAG ea778e37710c07723435b1be58235996d1d43a5a  # on the "cpp" branch
+)
+
+FetchContent_Populate(pocketfftx)
+FetchContent_GetProperties(pocketfftx)
+file(COPY pocketfftx/CMakeLists.txt DESTINATION ${pocketfftx_SOURCE_DIR})
+add_subdirectory(${pocketfftx_SOURCE_DIR})
+
+
+##### Fetch GTest #####
+
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
@@ -53,11 +49,11 @@ add_executable(
 
 add_subdirectory(src)
 
-add_dependencies(laplace_test project_fftw)
 target_link_libraries(
   laplace_test
   gtest_main
   laplace-inversion
+  pocketfftx
 )
 target_include_directories(laplace_test PUBLIC "${PROJECT_SOURCE_DIR}/src")
 include(GoogleTest)
