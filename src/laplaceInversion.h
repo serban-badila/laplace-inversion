@@ -1,8 +1,9 @@
 #include <vector>
 #include <complex>
+#include <cmath>
 #include <functional>
 
-#include <fftw3.h>
+#include <pocketfft_hdronly.h>
 
 #define PI 3.141592653589793238462643383279502884
 #define OVRSMPL 8

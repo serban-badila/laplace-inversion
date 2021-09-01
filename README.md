@@ -1,7 +1,7 @@
 # laplace-inversion
 Numerical inversion of Laplace transforms using Den Iseger's algorithm [1].
 
-Depends on [FFTW-3.3.9](http://www.fftw.org/) and [pybind11](https://github.com/pybind/pybind11).
+Depends on [pocketfft](https://gitlab.mpcdf.mpg.de/mtr/pocketfft/-/tree/cpp) and [pybind11](https://github.com/pybind/pybind11).
 
 
 # Usage

@@ -1,30 +1,36 @@
-#include <complex> // include this before the FFTW library
-#include <cmath>
-#include <vector>
-
 #include "laplaceInversion.h"
 
 namespace laplaceInversion {
 
-void __ifft(std::complex<double>* input, std::vector<double>& output, size_t len, double a)
-    /* Wrap the Fast Fourier Transform C routine. */
-{   size_t m = len / OVRSMPL;
-    fftw_complex *in, *out;
-    fftw_plan p;
+std::vector<double> __ifft(std::vector<std::complex<double>>& input, size_t len, double a)
+    /* Wrap the Fast Fourier Transform Cxx routine. */
+{   
+    size_t m = len / OVRSMPL;
+    pocketfft::shape_t shape{len};
+    pocketfft::stride_t strided(shape.size());
+    size_t tmpd=sizeof(std::complex<double>);
+    
+    for (int i = shape.size() - 1; i >= 0; i--)
+      {
+      strided[i] = tmpd;
+      tmpd *= shape[i];
+      }
+    size_t ndata {1};
+    for (size_t i=0; i<shape.size(); i++)
+      ndata*=shape[i];
+    
+    pocketfft::shape_t axes;
+    for (size_t i = 0; i < shape.size(); i++)
+      axes.push_back(i);
+    
+    std::vector<std::complex<double>> output(ndata);
+    pocketfft::c2c(shape, strided, strided, axes, pocketfft::BACKWARD, input.data(), output.data(), 1.);
 
-    in = (fftw_complex*) (input);
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * len);
-
-    p = fftw_plan_dft_1d(len, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
-    fftw_execute(p);    
-
-    output.resize(m);
-    for (size_t k=0; k < m; k++){
-        output[k] = exp(a*k) / len * out[k][0]; // the ifft doesn't normalize the inverse with <len> so do it here
+    std::vector<double> out (m);
+    for (size_t k = 0; k < m; k++){
+        out[k] = exp(a*k) / len * output[k].real(); // the ifft doesn't normalize the inverse with <len> so do it here
     }
-
-    fftw_destroy_plan(p);
-    fftw_free(out);
+    return out;
 }
 
 std::vector<double> __oneDimensionalInverse(
@@ -49,7 +55,7 @@ std::vector<double> __oneDimensionalInverse(
     std::complex<double> I {0.0 , 1.0}; // complex literals require >=c++14
     size_t m {static_cast<size_t> (pow(2, mexp))};
     size_t m2 {OVRSMPL * m};
-    std::complex<double> quad_approx[m2+1] {0.};
+    std::vector<std::complex<double>> quad_approx (m2+1);
     double a { 44.0 / static_cast<double> (m2) };
 
     std::complex<double> temp;
@@ -63,8 +69,7 @@ std::vector<double> __oneDimensionalInverse(
     quad_approx[0] = .5 * (quad_approx[0] + quad_approx[m2]);
 
     // now run the inverse Fast Fourier transform on the quadrature
-    std::vector<double> output;
-    __ifft(quad_approx, output, m2, a); // the last index of <quad_approx> will not be used in the ifft
+    auto output = __ifft(quad_approx, m2, a); // the last index of <quad_approx> will not be used in the ifft
     
     return output;
 }
