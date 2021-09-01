@@ -26,6 +26,16 @@ file(COPY pocketfftx/CMakeLists.txt DESTINATION ${pocketfftx_SOURCE_DIR})
 add_subdirectory(${pocketfftx_SOURCE_DIR})
 
 
+##### Fetch pybind11 #####
+
+MESSAGE(STATUS "Fetching pybind11...")
+FetchContent_Declare(
+    pybind11
+    GIT_REPOSITORY https://github.com/pybind/pybind11
+    GIT_TAG v2.7.1
+)
+FetchContent_MakeAvailable(pybind11)
+
 ##### Fetch GTest #####
 
 FetchContent_Declare(
@@ -40,14 +50,14 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+##### Generating the Gtest and pybind11 module targets #####
+
+add_subdirectory(src)
+
 add_executable(
   laplace_test
   tests/tests.cpp
 )
-
-##### Generating the Gtest and pybind11 module targets #####
-
-add_subdirectory(src)
 
 target_link_libraries(
   laplace_test
@@ -59,6 +69,5 @@ target_include_directories(laplace_test PUBLIC "${PROJECT_SOURCE_DIR}/src")
 include(GoogleTest)
 gtest_discover_tests(laplace_test)
 
-
-add_subdirectory(pybind11)
+# this requires pybind11 configured 
 add_subdirectory(py_laplace_inversion)
