@@ -1,12 +1,12 @@
 import os
 import subprocess
 import shlex
-import shutil
 
 from pathlib import Path
 
 from setuptools import setup  # a problem with the setup override from skbuild is that it wants to install
 # everything it can find in the CMakeLists.txt (nested also) which is not a good idea in this case
+from setuptools.dist import Distribution
 from skbuild.exceptions import SKBuildError
 from skbuild.cmaker import CMaker
 from skbuild.constants import CMAKE_BUILD_DIR
@@ -39,7 +39,6 @@ class PatchedCMaker(CMaker):
             filter(bool,
                    shlex.split(os.environ.get("SKBUILD_BUILD_OPTIONS", "")))
         )
-
         rtn = subprocess.call(cmd, cwd=CMAKE_BUILD_DIR(), env=env)
         if rtn != 0:
             raise SKBuildError(
@@ -52,6 +51,8 @@ class PatchedCMaker(CMaker):
                 "    {}\n"
                 "Please see CMake's output for more informationpy_laplace_inversion"
                 )
+
+
 readme_path = Path("README.md")
 long_description = readme_path.read_text(encoding="utf-8")
 version_path = Path("VERSION")
@@ -63,9 +64,12 @@ cmaker = PatchedCMaker()
 cmaker.configure()
 cmaker.make()
 
-pp = Path()
-compiled_extension = list(pp.glob(f"**/{BUILD_TARGET}.*.*")).pop()
-shutil.copyfile(compiled_extension.absolute(), pp.cwd() / PYTHON_MODULE / compiled_extension.name)
+
+class BinaryDistribution(Distribution):
+    """Force the the distribution to be flagged as non-pure."""
+    def has_ext_modules(foo):
+        return True
+
 
 setup(
     name="py-laplace-inversion",
@@ -84,5 +88,5 @@ setup(
     ],
     packages=['py_laplace_inversion'],
     package_dir={'py_laplace_inversion': 'py_laplace_inversion'},
-    package_data={'': [compiled_extension.name]},
+    distclass=BinaryDistribution
 )
