@@ -17,7 +17,7 @@ Not tested on platforms other than Linux yet.
 To build this project (cmake) and run the cxx tests
 
 ```
-cmake -S . -B cxx-build && cmake --build ./cxx-build && cd cxx-build && ctest
+cmake -S . -B cxx-build/debug -DCMAKE_BUILD_TYPE=Debug && cmake --build ./cxx-build/debug --config Debug && cd cxx-build/debug && ctest
 ```
 
 from the project root. This will build all targets including the python extension as a shared object.
