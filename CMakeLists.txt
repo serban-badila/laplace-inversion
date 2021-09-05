@@ -26,39 +26,51 @@ file(COPY pocketfftx/CMakeLists.txt DESTINATION ${pocketfftx_SOURCE_DIR})
 add_subdirectory(${pocketfftx_SOURCE_DIR})
 
 
-##### Fetch GTest #####
+##### Fetch pybind11 #####
 
+MESSAGE(STATUS "Fetching pybind11...")
 FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+    pybind11
+    GIT_REPOSITORY https://github.com/pybind/pybind11
+    GIT_TAG v2.7.1
 )
-
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(googletest)
-
-enable_testing()
-
-add_executable(
-  laplace_test
-  tests/tests.cpp
-)
-
-##### Generating the Gtest and pybind11 module targets #####
+FetchContent_MakeAvailable(pybind11)
 
 add_subdirectory(src)
 
-target_link_libraries(
-  laplace_test
-  gtest_main
-  laplace-inversion
-  pocketfftx
-)
-target_include_directories(laplace_test PUBLIC "${PROJECT_SOURCE_DIR}/src")
-include(GoogleTest)
-gtest_discover_tests(laplace_test)
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+  
+  ##### Fetch GTest #####
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+  )
 
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-add_subdirectory(pybind11)
-add_subdirectory(py_laplace_inversion)
+  FetchContent_MakeAvailable(googletest)
+
+  enable_testing()
+
+  add_executable(
+    laplace_test
+    tests/tests.cpp
+  )
+
+  target_link_libraries(
+    laplace_test
+    gtest_main
+    laplace-inversion
+    pocketfftx
+  )
+  target_include_directories(laplace_test PUBLIC "${PROJECT_SOURCE_DIR}/src")
+  include(GoogleTest)
+  gtest_discover_tests(laplace_test)
+
+endif(CMAKE_BUILD_TYPE MATCHES Debug)
+
+# this requires pybind11 configured 
+if(CMAKE_BUILD_TYPE MATCHES Release)
+  add_subdirectory(py_laplace_inversion)
+endif(CMAKE_BUILD_TYPE MATCHES Release)
