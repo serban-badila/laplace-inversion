@@ -24,8 +24,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r requirements-dev.txt
-    - name: Test python extension
+    - name: Build python binaries
       run: |
         python -m setup bdist_wheel
         python -m pip install ./dist/*
-        python -m pytest python_tests/
+    - name: Run tests
+      # avoid name conflict between the local python module name and the package name
+      run: |
+        cd .. 
+        python -m pytest laplace-inversion/python_tests/
