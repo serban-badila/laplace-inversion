@@ -1,3 +1,8 @@
+![CMake Build](https://github.com/serban-badila/laplace-inversion/actions/workflows/cmake.yml/badge.svg)
+![Py Build](https://github.com/serban-badila/laplace-inversion/actions/workflows/pytest.yml/badge.svg)
+
+git@github.com:serban-badila/laplace-inversion.git
+
 # laplace-inversion
 Numerical inversion of Laplace transforms using Den Iseger's algorithm [1].
 
