@@ -11,7 +11,7 @@ license_path = Path("LICENSE")
 license = license_path.read_text(encoding="utf-8").strip()
 
 
-setup(  # the cmake build type used by scikit-build defaults to "Release" 
+setup(  # the cmake build tag used by scikit-build defaults to "Release" 
     name="py-laplace-inversion",
     version=version,
     description="Numerical inversion of Laplace transforms using Den Iseger's algorithm.",
@@ -26,6 +26,5 @@ setup(  # the cmake build type used by scikit-build defaults to "Release"
         "License :: OSI Approved :: BSD 3-Clause",
         "Programming Language :: Python :: 3.7",
     ],
-    packages=['py_laplace_inversion'],
-    package_dir={'py_laplace_inversion': 'py_laplace_inversion'},
+    packages=['py_laplace_inversion']
 )

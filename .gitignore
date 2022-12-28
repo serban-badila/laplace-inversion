@@ -37,6 +37,7 @@ fftw/
 dist/
 *.egg-info/
 .eggs
+MANIFEST
 
 # IDE artifacts
 .idea

@@ -5,15 +5,15 @@ from math import exp
 @pytest.fixture()
 def exponential_transform():
     def _transform(rate):
-        def __inner(s):
+        def _inner(s):
             return rate / (s + rate)
-        return __inner
+        return _inner
     return _transform
 
 @pytest.fixture()
 def exponential_density():
     def _density(rate):
-        def __innner(x): 
+        def _inner(x): 
             return rate * exp( -rate * x) if x >= 0 else 0
-        return __innner
+        return _inner
     return _density

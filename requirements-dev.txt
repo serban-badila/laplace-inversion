@@ -1,5 +1,5 @@
-setuptools==56.0.0
-wheel==0.37.0
+setuptools==65.5.1
+wheel==0.38.1
 cmake==3.21.2
 scikit-build==0.12.0
 

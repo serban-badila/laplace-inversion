@@ -1,0 +1,8 @@
+include VERSION
+include README.md
+include LICENSE
+
+include CMakeLists.txt
+include src/*
+include py_laplace_inversion/*
+include pocketfftx/*
