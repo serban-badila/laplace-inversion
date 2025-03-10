@@ -1,3 +1,7 @@
+![CMake Build](https://github.com/serban-badila/laplace-inversion/actions/workflows/cmake.yml/badge.svg)
+![Py Build](https://github.com/serban-badila/laplace-inversion/actions/workflows/pytest.yml/badge.svg)
+
+
 # laplace-inversion
 Numerical inversion of Laplace transforms using Den Iseger's algorithm [1].
 
@@ -6,6 +10,8 @@ Depends on [pocketfft](https://gitlab.mpcdf.mpg.de/mtr/pocketfft/-/tree/cpp) and
 
 # Usage
 Requires a c++11 capable compiler present on the target system and cmake >=3.14 (still have to test different compilers).
+
+Currently it does not support python versions above 3.10.
 
 See the [demo.py](py_laplace_inversion/demo.py)
 
@@ -25,19 +31,16 @@ from the project root. This will build all targets including the python extensio
 
 ## Build the python wheels and run the pytests
 
-In a clean python virtual environment: 
+In a clean python virtual environment build and install the current project as a python package: 
 
 ```
-pip install -rrequirements-dev.txt
-python setup.py bdist_wheel
-pip install ./dist/*
+pip install .
 ```
 
-Besides building (cmake) the shared object in a separate build tree (_skbuild), `setup.py` will also copy it into `py_laplace_inversion` and this extension can be imported as any other python module. 
-Now you can run the python tests for the generated bindings
+Now you can run the python tests for the generated bindings (the changed directory avoids the name collision between the source module and the installed package name)
 
 ```
-python -m pytest python_tests/
+cd python_tests && python -m pytest 
 ```
 
 # TODO
